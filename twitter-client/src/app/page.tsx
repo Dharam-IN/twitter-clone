@@ -1,7 +1,9 @@
+'use client'
 import FeedCard from "@/components/Common/FeedCard";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useCallback } from "react";
 import { BiHome } from "react-icons/bi";
 import { BsTwitterX } from "react-icons/bs";
 import { CiCircleMore } from "react-icons/ci";
@@ -61,6 +63,10 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 ]
 
 export default function Home() {
+
+  const handleLoginWithGoogle = useCallback((cred: CredentialResponse) => {
+
+  }, [])
   
   return (
     <div className="grid grid-cols-12 h-screen px-52 2xl:w-[90%] 2xl:mx-auto">
@@ -99,7 +105,12 @@ export default function Home() {
         <FeedCard/>
         <FeedCard/>
       </div>
-      <div className="col-span-3"></div>
+      <div className="col-span-3">
+        <div className="p-3">
+          <h2 className="text-2xl font-bold mb-1">New To Twitter</h2>
+          <GoogleLogin onSuccess={(cred) => console.log(cred)}/>
+        </div>
+      </div>
     </div>
   );
 }
