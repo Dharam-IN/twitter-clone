@@ -18,6 +18,7 @@ import { graphqlClient } from "../../clients/api";
 import { verifyUserGoogleTokenQuery } from "../../graphql/query/user";
 import { useCurrentUser } from "../../hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
+import { IoImageOutline } from "react-icons/io5";
 
 
 interface TwitterSidebarButton {
@@ -28,75 +29,82 @@ interface TwitterSidebarButton {
 const SidebarMenuItems: TwitterSidebarButton[] = [
   {
     title: "Home",
-    icon: <BiHome/>
+    icon: <BiHome />
   },
   {
     title: "Explore",
-    icon: <IoMdSearch/>
+    icon: <IoMdSearch />
   },
   {
     title: "Notifications",
-    icon: <MdOutlineNotificationsNone/>
+    icon: <MdOutlineNotificationsNone />
   },
   {
     title: "Messages",
-    icon: <LuMessageSquare/>
+    icon: <LuMessageSquare />
   },
   {
     title: "Lists",
-    icon: <TbListSearch/>
+    icon: <TbListSearch />
   },
   {
     title: "Bookmarks",
-    icon: <PiBookmarkSimple/>
+    icon: <PiBookmarkSimple />
   },
   {
     title: "Communities",
-    icon: <LuUsers2/>
+    icon: <LuUsers2 />
   },
   {
     title: "Premium",
-    icon: <BsTwitterX/>
+    icon: <BsTwitterX />
   },
   {
     title: "Profile",
-    icon: <FaRegUser/>
+    icon: <FaRegUser />
   },
   {
     title: "More",
-    icon: <CiCircleMore/>
+    icon: <CiCircleMore />
   },
 ]
 
 export default function Home() {
 
-  const {user} = useCurrentUser()
+  const { user } = useCurrentUser()
   // console.log(user)
   const queryClient = useQueryClient()
 
-  const handleLoginWithGoogle = useCallback( async (cred: CredentialResponse) => {
+  const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
     const googleToken = cred.credential;
 
-    if(!googleToken) return toast.error("Google token not found")
+    if (!googleToken) return toast.error("Google token not found")
 
-    const {verifyGoogleToken} = await graphqlClient.request(verifyUserGoogleTokenQuery, {token: googleToken})
+    const { verifyGoogleToken } = await graphqlClient.request(verifyUserGoogleTokenQuery, { token: googleToken })
 
     toast.success("User Verify Success")
     console.log(verifyGoogleToken);
 
-    if(verifyGoogleToken)
+    if (verifyGoogleToken)
       window.localStorage.setItem('__twitter_token', verifyGoogleToken);
 
     await queryClient.invalidateQueries(["current-user"])
 
   }, [queryClient])
-  
+
+  const handleImageChoose = () => {
+    const input = document.createElement("input")
+    input.setAttribute("type", "file")
+    input.setAttribute("accept", "image/*")
+    input.click()
+  }
+
   return (
     <div className="grid grid-cols-12 h-screen px-52 2xl:w-[90%] 2xl:mx-auto">
       <div className="col-span-3 pt-1 px-5">
         <div>
           <Link href="/" className="hover:bg-gray-800 rounded-full transition-all duration-500 inline-block p-3">
-            <BsTwitterX className="text-2xl"/>
+            <BsTwitterX className="text-2xl" />
           </Link>
 
           <ul>
@@ -117,7 +125,7 @@ export default function Home() {
           {
             user && (
               <div className="flex mt-10 gap-3 hover:bg-gray-800 p-3 transition-all duration-500 rounded-full">
-                {user && user.profileImageURL && <Image src={user.profileImageURL} className="rounded-full" alt="Twitter Clone" width={50} height={50}/>}
+                {user && user.profileImageURL && <Image src={user.profileImageURL} className="rounded-full" alt="Twitter Clone" width={50} height={50} />}
                 <h3 className="font-bold text-xl">{user.firstName}</h3>
               </div>
             )
@@ -125,21 +133,47 @@ export default function Home() {
         </div>
       </div>
       <div className="col-span-6  border border-gray-800">
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
-        <FeedCard/>
+
+        <div>
+          <div className='p-5 border-b border-b-gray-800'>
+            <div className='grid grid-cols-12 gap-3'>
+              <div className="col-span-1">
+                <Image src="https://avatars.githubusercontent.com/u/122605883?v=4" width={50} height={50} alt='Avatar' className='rounded-full' />
+              </div>
+              <div className='col-span-11'>
+                <textarea className="w-full bg-transparent border-b-slate-700 border-b text-xl" placeholder="What is happening?!"></textarea>
+                <div className="mt-3 flex justify-between items-center">
+                  <button className="cursor-pointer" onClick={handleImageChoose}>
+                    <IoImageOutline className="text-primary text-xl"/>
+                  </button>
+                  <button className="bg-primary px-4 py-1 rounded-full">
+                    Post
+                  </button>
+                </div>
+
+                <div className='flex justify-between mt-5 text-sm'>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
+        <FeedCard />
       </div>
       <div className="col-span-3">
         {!user && <div className="p-3">
           <h2 className="text-2xl font-bold mb-1">New To Twitter</h2>
-          <GoogleLogin onSuccess={handleLoginWithGoogle}/>
+          <GoogleLogin onSuccess={handleLoginWithGoogle} />
         </div>}
       </div>
       <Toaster />
