@@ -16,6 +16,8 @@ import { TbListSearch } from "react-icons/tb";
 import toast, { Toaster } from 'react-hot-toast';
 import { graphqlClient } from "../../clients/api";
 import { verifyUserGoogleTokenQuery } from "../../graphql/query/user";
+import { useCurrentUser } from "../../hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 interface TwitterSidebarButton {
@@ -68,6 +70,10 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 
 export default function Home() {
 
+  const {user} = useCurrentUser()
+  // console.log(user)
+  const queryClient = useQueryClient()
+
   const handleLoginWithGoogle = useCallback( async (cred: CredentialResponse) => {
     const googleToken = cred.credential;
 
@@ -78,11 +84,12 @@ export default function Home() {
     toast.success("User Verify Success")
     console.log(verifyGoogleToken);
 
-    if(verifyGoogleToken){
+    if(verifyGoogleToken)
       window.localStorage.setItem('__twitter_token', verifyGoogleToken);
-    }
 
-  }, [])
+    await queryClient.invalidateQueries(["current-user"])
+
+  }, [queryClient])
   
   return (
     <div className="grid grid-cols-12 h-screen px-52 2xl:w-[90%] 2xl:mx-auto">
@@ -107,6 +114,14 @@ export default function Home() {
               Post
             </button>
           </div>
+          {
+            user && (
+              <div className="flex mt-10 gap-3 hover:bg-gray-800 p-3 transition-all duration-500 rounded-full">
+                {user && user.profileImageURL && <Image src={user.profileImageURL} className="rounded-full" alt="Twitter Clone" width={50} height={50}/>}
+                <h3 className="font-bold text-xl">{user.firstName}</h3>
+              </div>
+            )
+          }
         </div>
       </div>
       <div className="col-span-6  border border-gray-800">
@@ -122,10 +137,10 @@ export default function Home() {
         <FeedCard/>
       </div>
       <div className="col-span-3">
-        <div className="p-3">
+        {!user && <div className="p-3">
           <h2 className="text-2xl font-bold mb-1">New To Twitter</h2>
           <GoogleLogin onSuccess={handleLoginWithGoogle}/>
-        </div>
+        </div>}
       </div>
       <Toaster />
     </div>
