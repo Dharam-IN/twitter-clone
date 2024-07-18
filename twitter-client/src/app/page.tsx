@@ -13,6 +13,10 @@ import { LuMessageSquare, LuUsers2 } from "react-icons/lu";
 import { MdOutlineNotificationsNone } from "react-icons/md";
 import { PiBookmarkSimple } from "react-icons/pi";
 import { TbListSearch } from "react-icons/tb";
+import toast, { Toaster } from 'react-hot-toast';
+import { graphqlClient } from "../../clients/api";
+import { verifyUserGoogleTokenQuery } from "../../graphql/query/user";
+
 
 interface TwitterSidebarButton {
   title: string;
@@ -64,7 +68,19 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 
 export default function Home() {
 
-  const handleLoginWithGoogle = useCallback((cred: CredentialResponse) => {
+  const handleLoginWithGoogle = useCallback( async (cred: CredentialResponse) => {
+    const googleToken = cred.credential;
+
+    if(!googleToken) return toast.error("Google token not found")
+
+    const {verifyGoogleToken} = await graphqlClient.request(verifyUserGoogleTokenQuery, {token: googleToken})
+
+    toast.success("User Verify Success")
+    console.log(verifyGoogleToken);
+
+    if(verifyGoogleToken){
+      window.localStorage.setItem('__twitter_token', verifyGoogleToken);
+    }
 
   }, [])
   
@@ -108,9 +124,10 @@ export default function Home() {
       <div className="col-span-3">
         <div className="p-3">
           <h2 className="text-2xl font-bold mb-1">New To Twitter</h2>
-          <GoogleLogin onSuccess={(cred) => console.log(cred)}/>
+          <GoogleLogin onSuccess={handleLoginWithGoogle}/>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
