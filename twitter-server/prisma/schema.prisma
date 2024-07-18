@@ -17,7 +17,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  tweet Tweet[]
+  tweets Tweet[]
 }
 
 model Tweet {
@@ -25,7 +25,7 @@ model Tweet {
   content String
   imageURL String?
 
-  author User @relation(fields: [id], references: [id])
+  author User @relation(fields: [authorId], references: [id])
   authorId String
   
   createdAt DateTime @default(now())
