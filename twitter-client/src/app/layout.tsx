@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import {GoogleOAuthProvider} from '@react-oauth/google'
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import Provider from "./Provider";
 
 const inter = Inter({ subsets: ["latin"] });
-
-const queryClient = new QueryClient()
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,14 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-            <Provider>
-              <GoogleOAuthProvider clientId="692297439950-ih2ioeg72p9fht8vcnu0mpg9sspsj4gc.apps.googleusercontent.com">
-                  {children}
-              </GoogleOAuthProvider>
-              <ReactQueryDevtools/>
-            </Provider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
